@@ -1,0 +1,3 @@
+# MMQ_App
+This is a tkinter project made to learn more about the package. It's not done but it's really close to it. The notes that i made in the code are all in portuguese and i won't change it.
+If you want to understand what he project does here it goes a simple explanation: The main code is the MMQ code. When you run this code open a window that you can put the values of x, y, and the uncertaintys. Then when you click to calculte opens other window that shows the graph and the values found to each variable. If you want really understand it you need to search more about minimum square method
