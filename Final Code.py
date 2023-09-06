@@ -7,6 +7,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 C1 = '#fcf3e6'
 C2 = '#262400'
+C3 = '#ffcfd1'
+
+Texto_br = []
 
 # mlk.theme_use('default')
 # funçoes usadas:
@@ -23,6 +26,7 @@ def mmq(y, x, j, k, key, key3):
 
     key2 = 0
     uyt = '*'
+    error = False
     # função que cria a lista de x's ao quadrado
 
     def quadrado(g):
@@ -47,11 +51,18 @@ def mmq(y, x, j, k, key, key3):
     # Verificando se o numero de Y's é o mesmo que de X's e aparecendo o erro.
 
     if float(len(xs1)) != float(len(ys1)):
-        janelaerro = tk.Tk()
-        erro = ttk.Label(janelaerro, text='ERRO, numero de variaveis diferente.')
-        erro.pack()
-        janelaerro.mainloop()
-        return print('erro 1')
+        error = True
+        text = 'Numero de variaveis diferente'
+        janelaerro1 = tk.Toplevel()
+        janelaerro1.geometry('200x70')
+        FrameErro = tk.Frame(janelaerro1, background=C3)
+        erro = ttk.Label(FrameErro, text='ERRO', font=('Agency FB', 16), background=C3)
+        texto_erro = ttk.Label(FrameErro, text=text, font=('Arial', 10), background=C3)
+        texto_erro.grid(row=1, column=0)
+        erro.grid(row=0, column=0)
+        janelaerro1.configure(background=C3)
+        FrameErro.place(x=10, y=5)
+        return
 
     # verificando as incertezas de x e y, se precisamos inverter os valores ou se temos
     # incertezas diferentes
@@ -69,13 +80,22 @@ def mmq(y, x, j, k, key, key3):
         ux = ux1[0]
     if len(uy1) > 1:
         if float(len(uy1)) != float(len(ys1)):
-            janelaerro = tk.Tk()
-            erro = ttk.Label(janelaerro, text='ERRO, quando temos mais que uma incerteza precisamos que o numero de'
-                                              'incertezas seja igual ao numero de valores em y. (em quantidade).')
-            erro.pack()
-            janelaerro.mainloop()
-            return print('erro 2')
-        key2 = 1
+            error = True
+            text = 'Numero de incertezas difere do de variaveis'
+            janelaerro2 = tk.Toplevel()
+            janelaerro2.geometry('277x70')
+            FrameErro = tk.Frame(janelaerro2, background=C3)
+            erro = ttk.Label(FrameErro, text='ERRO', font=('Agency FB', 16), background=C3)
+            texto_erro1 = ttk.Label(FrameErro, text=text, font=('Arial', 10), background=C3)
+            texto_erro1.grid(row=1, column=0)
+            erro.grid(row=0, column=0)
+            janelaerro2.configure(background=C3)
+            FrameErro.place(x=10, y=5)
+            janelaerro2.resizable(False, False)
+            return()
+        else:
+            key2 = 1
+
 
 
     ys, xs = ys1, xs1
@@ -202,14 +222,16 @@ def mmq(y, x, j, k, key, key3):
                           'somatorio_xs': sum(xs1), "somatorio_xs²": sum(quadrado(xs1)), "somatorio_xy": sum(xy),
                           'somatorio_ys': sum(ys1), "variavel_n": n, "variavel_delta": delta, "alinha": alinha,
                           "ualinha": ualinha, 'blinha': blinha, 'ublinha': ublinha}
-    return [dados, dados_importatntes]
+    return [dados, dados_importatntes, error]
 
 
 def open_result(d):
     # Função que cria uma tabela 2xN com dicionário de entrada
+    if d[2]:
+        return()
     def tabelayx2(dic, color, font):
         lista = list(dic.keys())
-        tabela = tk.Frame(Graficos)
+        tabela = tk.Frame(Tabelas)
         for i in lista:
             c1 = color[0]
             c2 = color[1]
@@ -231,18 +253,22 @@ def open_result(d):
             label2.grid(column=2, row=lista.index(i))
         return tabela
 
-    Resultado = tk.Tk()
+    Resultado = tk.Toplevel()
 
     Resultado.configure(background='white')
-    Resultado.geometry('1100x800')
+    Resultado.geometry('1100x620')
 
     # Note dos graficos
     Note = ttk.Notebook(Resultado)
     Note.pack()
 
     # Frame de graficos
+    Tabelas = tk.Frame(Resultado, background='white')
     Graficos = tk.Frame(Resultado, background='white')
+    Tabelas.pack()
     Graficos.pack()
+
+
 
     # criação do grafico de MMQ
     fig, mmq = plt.subplots(figsize=(8, 5))
@@ -286,7 +312,7 @@ def open_result(d):
 
     # Colocando grafico de Incerteza normal na janela
     canva2 = FigureCanvasTkAgg(fig2, Graficos)
-    canva2.get_tk_widget().grid(column=3, row=3)
+    canva2.get_tk_widget().grid(column=0, row=1)
 
     # Criando graficos de incertezas ao quadrado
     labels_U2 = ['Ux²', 'Uy²']
@@ -307,22 +333,39 @@ def open_result(d):
 
     # Colocando grafico de icertezas ao quadrado na janela
     canva1 = FigureCanvasTkAgg(fig1, Graficos)
-    canva1.get_tk_widget().grid(column=2, row=3)
+    canva1.get_tk_widget().grid(column=0, row=2)
 
-    # colocando dados e criando a tabela
+    # dividindo o dicionario em 2 menores
+
+    d1 = {"variavel_a": d[1]["variavel_a"], "incerteza_a": d[1]["incerteza_a"],  "variavel_b": d[1]["variavel_b"],
+          "incerteza_b": d[1]["incerteza_b"],'somatorio_xs': d[1]['somatorio_xs'], "somatorio_xs²": d[1]["somatorio_xs²"],
+          "somatorio_xy": d[1]["somatorio_xy"]}
+
+    d2 = {'somatorio_ys': d[1]['somatorio_ys'] , "variavel_n": d[1]["variavel_n"],
+          "variavel_delta": d[1]["variavel_delta"], "alinha": d[1]["alinha"],"ualinha": d[1]["ualinha"],
+          'blinha': d[1]['blinha'], 'ublinha': d[1]['ublinha']}
+
+    # criando e colocando as tabelas
     tabelayx2(
-        d[1],
+        d1,
         ['#ffac84', '#ffac84', '#ff9684', '#ff9684', 'white'],
         'Arial 12'
-    ).grid(column=1, row=1, rowspan=3, padx=5)
+    ).place(x=180, y=200)
 
-    # Criando Frame 2 com mais informações e tabelas
+    tabelayx2(
+        d2,
+        ['#ffac84', '#ffac84', '#ff9684', '#ff9684', 'white'],
+        'Arial 12'
+    ).place(x= 620, y=200)
+
+    # titulo tabelas
+
+    titulo_tabelas = tk.Label(Tabelas, text='Tabelas e informações', font=('Agency FB', 25), background='white')
+    titulo_tabelas.place(x=410, y=50)
 
     # Adicionando Graficos ao note
     Note.add(Graficos, text='Graficos')
-
-
-    Resultado.mainloop()
+    Note.add(Tabelas, text='Tabelas e contas')
 
 
 def checkbox(j):
@@ -333,6 +376,7 @@ def checkbox(j):
 # janelas
 
 janela = Tk(className='e - Window Color')
+janela.title('Least Square Method')
 janela.configure(background=C1)
 janela.geometry('700x400')
 janela.resizable(False, False)
@@ -360,7 +404,7 @@ FrameCB.place(x=200, y=290)
 # Frames
 Entrada_Y1 = tk.Frame(janela, background=C1)
 
-Texto_Entrada_Y = ttk.Label(Entrada_Y1, text='Variaveis Y', font=('Agency FB', 15), background=C1)
+Texto_Entrada_Y = ttk.Label(Entrada_Y1, text='Entrada Y', font=('Agency FB', 15), background=C1)
 Texto_Entrada_Y.pack()
 
 Entrada_Y = Text(Entrada_Y1, width=40, height=5, highlightthickness=2, highlightbackground='grey53',
@@ -369,7 +413,7 @@ Entrada_Y.pack()
 
 
 Entrada_Y1.pack()
-Entrada_Y1.place(x=20, y=80)
+Entrada_Y1.place(x=355, y=60)
 
 Incerteza_Y = tk.Frame(janela, background=C1)
 Texto_Entrada_IncertezaY = ttk.Label(Incerteza_Y, text='Incerteza de Y', font=('Agency FB', 12), background=C1)
@@ -383,7 +427,11 @@ Incerteza_Y.pack()
 Incerteza_Y.place(x=75, y=205)
 
 Titulo = ttk.Label(text='Calculo de MMQ', font=('Agency FB', 30), foreground=C2, background=C1)
-Titulo.pack(pady=25)
+Titulo.pack(pady=10)
+
+Aviso = ttk.Label(text='Separe as variaveis com um espaço entre elas. O numero de variaveis X e Y precisa ser igual.'
+                       ' Precisamos de mais que uma variavel por entrada', font=('Agency FB', 11), foreground=C2, background=C1)
+Aviso.place(x=30, y=176)
 
 Entrada_X1 = tk.Frame(janela, background=C1)
 Texto_Entrada_X = ttk.Label(Entrada_X1, text='Entrada X', font=('Agency FB', 15), background=C1)
@@ -395,7 +443,7 @@ Entrada_X = Text(Entrada_X1, width=40, height=5, highlightthickness=2, highlight
 Entrada_X.pack()
 
 Entrada_X1.pack()
-Entrada_X1.place(x=355, y=80)
+Entrada_X1.place(x=20, y=60)
 
 Incerteza_X = tk.Frame(janela, background=C1)
 Texto_Entrada_IncertezaX = ttk.Label(Incerteza_X, text='Incerteza de X', font=('Agency FB', 12), background=C1)
@@ -409,9 +457,12 @@ Incerteza_X.pack()
 Incerteza_X.place(x=425, y=205)
 
 
-Botao = ttk.Button(janela, text='calcule', command=lambda: open_result((mmq(Entrada_Y.get('1.0', 'end'),
-        Entrada_X.get('1.0', 'end'), Entrada_IncertezaY.get('1.0', 'end'), Entrada_IncertezaX.get('1.0', 'end'),
-        (checkbox(chave1)), (checkbox(chave3))))))
+Botao = ttk.Button(janela, text='calcule',
+                   command=lambda: open_result((mmq(Entrada_Y.get('1.0', 'end'),
+                                                    Entrada_X.get('1.0', 'end'),
+                                                    Entrada_IncertezaY.get('1.0', 'end'),
+                                                    Entrada_IncertezaX.get('1.0', 'end'),
+                                                    (checkbox(chave1)), (checkbox(chave3))))))
 
 
 Botao.pack()
