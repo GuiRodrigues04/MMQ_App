@@ -1,6 +1,6 @@
 # MMQ_App
 
-* Youtube - Video explanation:
+* Youtube - Video explanation: https://youtu.be/hYzo2q_vRkM
 
 > This is an app that calculates the function that best fit some data, using the least squares mathod, with measurement error propagation. The code was all done with python and I used tkinter as the principal package.
   The math was done all from skretch, there is no package that helped me with the calculos, so no scikit-learn, pandas, numpy or anything like that.
